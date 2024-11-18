@@ -64,10 +64,14 @@ def train(cfg: DictConfig) -> tuple[dict, dict]:
     logger: list[Logger] = utils.instantiate_loggers(cfg.get("logger"))
 
     log.info(f"Instantiating trainer <{cfg.trainer._target_}>")
+    num_gpus = torch.cuda.device_count()
     trainer: Trainer = hydra.utils.instantiate(
         cfg.trainer,
         callbacks=callbacks,
         logger=logger,
+        accelerator='gpu',
+        devices=num_gpus,
+        strategy='ddp',
     )
 
     object_dict = {
